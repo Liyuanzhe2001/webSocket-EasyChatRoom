@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>>
+    <script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+    <style>
+        div {
+            margin-bottom: 50px;
+            border-bottom: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+用户名
+<div id="userName"></div>
+
+好友列表
+<div id="userlist"></div>
+
+通知
+<div id="broadcastList"></div>
+
+聊天状态
+<div id="chatArea" style="display: none;border-bottom: none;">
+    <div id="chatMes"></div>
+</div>
+<br>
+
+聊天区
+<div id="msgs">
+
+</div>
+
+输入内容
+<textarea id="context_text" style="width: 300px;height: 200px">
+
+</textarea>
+<input type="button" id="submit" value="发送">
+
+</body>
+<script>
+    var toName;
+    var username;
+    $(function () {
+        $.ajax({
+            url: "getUsername",
+            success: function (res) {
+                username = res;
+                $("#userName").html("用户：" + res + "&nbsp;&nbsp;&nbsp;&nbsp;<span>在线</span>");
+            },
+            async: false
+        });
+    });
+
+    function showChat(name) {
+        toName = name;
+        //清除聊天区的数据
+        $("#msgs").html("");
+        //现在聊天对话框
+        $("#chatArea").css("display", "inline");
+        //显示“正在和谁聊天”
+        $("#chatMes").html("正在和 <font face=\"楷体\">" + toName + "</font> 聊天");
+        // sessionStrange
+        var chatData = sessionStorage.getItem(toName);
+        if (chatData !== null) {
+            // 将聊天记录渲染到聊天区
+            $("#msgs").html(chatData);
+        }
+
+
+    }
+
+    $(function () {
+        $.ajax({
+            url: "getUsername",
+            success: function (res) {
+                username = res;
+                //显示在线信息
+                $("#userName").html(" 用户：" + res + "<span>在线</span>");
+            },
+            async: false
+        })
+
+        //创建websocket
+        var ws;
+        if (window.WebSocket) {
+            ws = new WebSocket("ws://localhost:8080/chat");
+        }
+
+        //绑定事件
+        ws.onopen = function (evt) {
+            //显示在线信息
+            $("#userName").html(" 用户：" + username + "<span>在线</span>");
+        }
+
+        ws.onmessage = function (evt) {
+            //接收服务器推送的消息
+            var data = evt.data;
+            //将该字符串数据转换为json
+            var res = JSON.parse(data);
+            //判断是系统消息还是推送给个人的消息
+            if (res.isSystem) {
+                //系统消息
+                var names = res.message;
+                var userListStr = "";
+                var broadcastStr = "";
+                for (var name of names) {
+                    if (name !== username) {
+                        userListStr += "<li><a style='cursor: pointer' onclick='showChat(\"" + name + "\")'>" + name + "</a></li>";
+                        broadcastStr += "<li>您的好友 " + name + " 已上线</li>";
+                    }
+                }
+                //将数据渲染到页面
+                $("#userlist").html(userListStr);
+                $("#broadcastList").html(broadcastStr);
+            } else {
+                //非系统消息
+                var content = res.message;
+
+                //拼接聊天区展示的数据
+                var str = "<div>" + toName + ": " + content + "</div> ";
+
+                if (toName === res.fromName) {
+                    //将数据追加到聊天区
+                    $("#msgs").append(str);
+                }
+
+                var chatData = sessionStorage.getItem(res.fromName);
+                if (chatData !== null) {
+                    str = chatData + str;
+                }
+                sessionStorage.setItem(res.fromName, str);
+            }
+        }
+
+        ws.onclose = function () {
+            //显示在线信息
+            $("#userName").html(" 用户：" + username + "<span>离线</span>");
+        }
+
+        //给发送按钮绑定点击事件
+        $("#submit").click(function () {
+            //获取输入的内容
+            var data = $("#context_text").val();
+            //将该文本框清空
+            $("#context_text").val("");
+            //拼接消息
+            var str = "<div>" + username + ": " + data + "</div> ";
+            $("#msgs").append(str);
+
+            var chatData = sessionStorage.getItem(toName);
+            if (chatData !== null) {
+                str = chatData + str;
+            }
+
+            sessionStorage.setItem(toName, str);
+
+            //定义服务端需要的数据格式
+            var message = {toName: toName, message: data};
+            //将输入的数据发送给服务器
+            ws.send(JSON.stringify(message));
+        });
+    })
+
+
+</script>
+</html>
