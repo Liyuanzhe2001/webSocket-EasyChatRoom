@@ -4,7 +4,7 @@
       <el-avatar :src="avatarImg"/>
     </div>
     <div class='msg' ref="bubble">
-      你好aaaaaaaaaaaaaaaaaaaaaaaa啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      {{content}}
     </div>
   </div>
 </template>
@@ -18,6 +18,9 @@ export default {
     maxWidth: {
       type: String,
       default: "300px"
+    },
+    content: {
+      type: String,
     }
   },
   mounted() {
@@ -32,7 +35,7 @@ export default {
 </script>
 
 <style scoped>
-div:first-child{
+div:first-child {
   vertical-align: top;
 }
 

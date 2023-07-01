@@ -1,30 +1,18 @@
 <template>
   <div class="main_part">
     <div class="left_part">
-      <el-scrollbar class="chat_window">
-        <div>
-          <LeftBubble max-width="400px"/>
-        </div>
-        <div>
-          <LeftBubble max-width="400px"/>
-        </div>
-        <div>
-          <LeftBubble max-width="400px"/>
-        </div>
-        <div>
-          <LeftBubble max-width="400px"/>
-        </div>
-        <div>
-          <RightBubble max-width="400px"/>
-        </div>
-        <div>
-          <RightBubble max-width="400px"/>
-        </div>
-        <div>
-          <RightBubble max-width="400px"/>
-        </div>
-        <div>
-          <RightBubble max-width="400px"/>
+      <el-scrollbar ref="chatWindow" max-height="330px" class="chat_window">
+        <div v-for="message in messages" :key="message">
+          <div v-if="message.type === 'in'">
+            <LeftBubble
+                :content="message.content"
+                max-width="400px"/>
+          </div>
+          <div v-else>
+            <RightBubble
+                :content="message.content"
+                max-width="400px"/>
+          </div>
         </div>
       </el-scrollbar>
       <el-input
@@ -36,7 +24,13 @@
           type="textarea"
           placeholder="在这里输入消息"
       />
-      <el-button class="btn" type="primary">发送</el-button>
+      <el-button
+          class="btn"
+          type="primary"
+          @click="submit"
+      >
+        发送
+      </el-button>
     </div>
     <div class="right_part">
       <div class="person_list_part">
@@ -66,16 +60,60 @@ import {Right} from "@element-plus/icons-vue";
 export default {
   name: "ChatRoom",
   components: {Right, LeftBubble, RightBubble},
+  mounted() {
+    this.scrollToBottom()
+  },
   data() {
     return {
       submitText: '',
       selectedPerson: '',
       personList: ['小明', '小兰', '小红', '张三', '李四', '王五', '赵六'],
+      messages: [
+        {
+          type: 'in',
+          content: '你好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
+        },
+        {
+          type: 'out',
+          content: '我很好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
+        },
+        {
+          type: 'in',
+          content: '你好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
+        },
+        {
+          type: 'in',
+          content: '你好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
+        },
+        {
+          type: 'in',
+          content: '你好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
+        },
+        {
+          type: 'out',
+          content: '我很好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
+        },
+        {
+          type: 'out',
+          content: '我很好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
+        },
+      ]
     }
   },
   methods: {
     chatWith(person) {
       this.selectedPerson = person
+    },
+    scrollToBottom() {
+      this.$refs.chatWindow.scrollTo(0, this.$refs.chatWindow.wrapRef.scrollHeight)
+    },
+    submit() {
+      this.messages.push({
+        type: 'out',
+        content: this.submitText
+      })
+      this.submitText = '';
+      this.scrollToBottom()
     }
   }
 }

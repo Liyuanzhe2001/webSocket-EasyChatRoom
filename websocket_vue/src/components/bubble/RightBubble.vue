@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%;padding: 20px;text-align: right">
     <div class='msg' ref="bubble">
-      你好aaaaaaaaaaaaaaaaaaaaaaaa啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      {{ content }}
     </div>
     <div class="avatar_part">
       <el-avatar :src="avatarImg"/>
@@ -18,6 +18,9 @@ export default {
     maxWidth: {
       type: String,
       default: "300px"
+    },
+    content: {
+      type: String,
     }
   },
   mounted() {
@@ -32,7 +35,7 @@ export default {
 </script>
 
 <style scoped>
-div:first-child{
+div:first-child {
   vertical-align: top;
 }
 
@@ -44,6 +47,7 @@ div:first-child{
   border-radius: 10px;
   background: limegreen;
   word-wrap: break-word;
+  text-align: left;
 }
 
 .avatar_part {
