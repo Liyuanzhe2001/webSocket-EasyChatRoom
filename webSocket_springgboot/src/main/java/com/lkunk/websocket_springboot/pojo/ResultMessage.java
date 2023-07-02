@@ -1,4 +1,4 @@
-package com.lkunk.websocket_springgboot.pojo;
+package com.lkunk.websocket_springboot.pojo;
 
 /**
  * @description 服务器发送给浏览器的websocket数据

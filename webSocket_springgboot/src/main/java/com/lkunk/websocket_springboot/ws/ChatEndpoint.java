@@ -1,9 +1,9 @@
-package com.lkunk.websocket_springgboot.ws;
+package com.lkunk.websocket_springboot.ws;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lkunk.websocket_springgboot.config.GetHttpSessionConfigurator;
-import com.lkunk.websocket_springgboot.pojo.Message;
-import com.lkunk.websocket_springgboot.utils.MessageUtils;
+import com.lkunk.websocket_springboot.config.GetHttpSessionConfigurator;
+import com.lkunk.websocket_springboot.pojo.Message;
+import com.lkunk.websocket_springboot.utils.MessageUtils;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpSession;

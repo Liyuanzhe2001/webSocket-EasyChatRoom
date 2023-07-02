@@ -1,4 +1,4 @@
-package com.lkunk.websocket_springgboot.config;
+package com.lkunk.websocket_springboot.config;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.HandshakeResponse;

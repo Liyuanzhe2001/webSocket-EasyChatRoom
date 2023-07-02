@@ -1,8 +1,8 @@
-package com.lkunk.websocket_springgboot.utils;
+package com.lkunk.websocket_springboot.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lkunk.websocket_springgboot.pojo.ResultMessage;
+import com.lkunk.websocket_springboot.pojo.ResultMessage;
 
 /**
  * @description 用来封装消息的工具类

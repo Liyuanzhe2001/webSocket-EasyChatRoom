@@ -32,6 +32,8 @@ export default {
               location.href = "main";
             } else {
               ElMessage.error('登录失败')
+              this.loginForm.username = '';
+              this.loginForm.password = '';
             }
           })
     }

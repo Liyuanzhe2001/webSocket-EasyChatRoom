@@ -1,4 +1,4 @@
-package com.lkunk.websocket_springgboot.config;
+package com.lkunk.websocket_springboot.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

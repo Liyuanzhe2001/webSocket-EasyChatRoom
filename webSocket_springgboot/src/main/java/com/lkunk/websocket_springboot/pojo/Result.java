@@ -1,4 +1,4 @@
-package com.lkunk.websocket_springgboot.pojo;
+package com.lkunk.websocket_springboot.pojo;
 
 /**
  * @description 用于登陆响应回给浏览器的数据
