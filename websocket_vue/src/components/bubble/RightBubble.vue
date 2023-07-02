@@ -43,6 +43,7 @@ div:first-child {
   display: inline-block;
   margin-right: 20px;
   min-height: 20px;
+  min-width: 20px;
   padding: 8px;
   border-radius: 10px;
   background: limegreen;

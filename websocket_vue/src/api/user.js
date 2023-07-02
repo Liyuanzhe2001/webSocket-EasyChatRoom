@@ -1,8 +1,20 @@
 import axios from '@/plugins/axios'
 
-export function login() {
+export function login(username, password) {
     return axios({
-        url: 'login',
-        method: 'POST'
+        url: '/login',
+        method: 'POST',
+        data: {
+            username,
+            password
+        }
+    })
+}
+
+export function getUsername() {
+    return axios({
+        url: '/getUsername',
+        method: 'GET',
+        async: false,
     })
 }

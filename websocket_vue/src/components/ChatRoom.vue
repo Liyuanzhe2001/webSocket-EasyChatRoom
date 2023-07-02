@@ -1,7 +1,7 @@
 <template>
   <div class="main_part">
     <div class="left_part">
-      <el-scrollbar ref="chatWindow" max-height="330px" class="chat_window">
+      <el-scrollbar ref="chatWindow" class="chat_window">
         <div v-for="message in messages" :key="message">
           <div v-if="message.type === 'in'">
             <LeftBubble
@@ -45,9 +45,12 @@
           </p>
         </el-scrollbar>
       </div>
-      <div class="system_inform_part">
-        暂无系统消息
-      </div>
+      <el-scrollbar class="system_inform_part">
+        <div v-for="person in personList" :key="person">
+          <p>您的好友&nbsp;{{ person }}&nbsp;已上线</p>
+        </div>
+        <!--        暂无系统消息-->
+      </el-scrollbar>
     </div>
   </div>
 </template>
@@ -56,56 +59,74 @@
 import LeftBubble from "@/components/bubble/LeftBubble";
 import RightBubble from "@/components/bubble/RightBubble";
 import {Right} from "@element-plus/icons-vue";
+import {getUsername} from "@/api/user";
 
 export default {
   name: "ChatRoom",
   components: {Right, LeftBubble, RightBubble},
   mounted() {
-    this.scrollToBottom()
+    this.initUsername();
+    this.initWebSocket();
+    this.scrollToBottom();
   },
   data() {
     return {
+      username: '',
       submitText: '',
       selectedPerson: '',
-      personList: ['小明', '小兰', '小红', '张三', '李四', '王五', '赵六'],
-      messages: [
-        {
-          type: 'in',
-          content: '你好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
-        },
-        {
-          type: 'out',
-          content: '我很好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
-        },
-        {
-          type: 'in',
-          content: '你好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
-        },
-        {
-          type: 'in',
-          content: '你好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
-        },
-        {
-          type: 'in',
-          content: '你好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
-        },
-        {
-          type: 'out',
-          content: '我很好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
-        },
-        {
-          type: 'out',
-          content: '我很好啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊啊',
-        },
-      ]
+      personList: [],
+      messages: [],
+      ws: '',
     }
   },
   methods: {
+    initUsername() {
+      getUsername()
+          .then(res => {
+            this.username = res;
+          })
+    },
+    initWebSocket() {
+      var vue = this;
+      //创建websocket
+      if (window.WebSocket) {
+        vue.ws = new WebSocket("ws://localhost:8088/chat");
+      }
+      vue.ws.onopen = function (evt) {
+
+      }
+      vue.ws.onmessage = function (evt) {
+        //接收服务器推送的消息
+        var res = JSON.parse(evt.data);
+        //判断是系统消息还是推送给个人的消息
+        if (res.isSystem) {
+          //系统消息
+          vue.personList = [];
+          for (var name of res.message) {
+            if (name !== vue.username) {
+              vue.personList.push(name);
+            }
+          }
+        } else {
+          if (vue.selectedPerson === res.fromName) {
+            //将数据追加到聊天区
+            vue.messages.push({
+              type: "in",
+              content: res.message,
+            })
+          }
+        }
+      }
+      vue.ws.onclose = function (evt) {
+
+      }
+    },
     chatWith(person) {
+      // TODO 查询与该用户的聊天记录
       this.selectedPerson = person
     },
     scrollToBottom() {
-      this.$refs.chatWindow.scrollTo(0, this.$refs.chatWindow.wrapRef.scrollHeight)
+      this.$refs.chatWindow.setScrollTop(this.$refs.chatWindow.wrapRef.scrollHeight)
     },
     submit() {
       this.messages.push({
@@ -113,7 +134,13 @@ export default {
         content: this.submitText
       })
       this.submitText = '';
-      this.scrollToBottom()
+      this.$nextTick(() => {
+        this.scrollToBottom()
+      })
+      //定义服务端需要的数据格式
+      var message = {toName: this.selectedPerson, message: this.submitText};
+      //将输入的数据发送给服务器
+      this.ws.send(JSON.stringify(message));
     }
   }
 }
@@ -190,7 +217,8 @@ export default {
   border-radius: 4px;
   margin-top: 3px;
   height: 237px;
-  padding: 3px;
+  padding: 5px;
+  line-height: 30px;
 }
 
 </style>

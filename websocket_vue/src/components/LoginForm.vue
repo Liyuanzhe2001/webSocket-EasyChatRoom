@@ -2,8 +2,8 @@
   <div class="login-wrapper">
     <div class="header">Login</div>
     <div class="form-wrapper">
-      <input type="text" :value="loginForm.username" name="username" placeholder="username" class="input-item">
-      <input type="password" :value="loginForm.password" name="password" placeholder="password" class="input-item">
+      <input type="text" v-model="loginForm.username" name="username" placeholder="username" class="input-item"/>
+      <input type="password" v-model="loginForm.password" name="password" placeholder="password" class="input-item"/>
       <div class="btn" @click="submit">Login</div>
     </div>
   </div>
@@ -11,6 +11,7 @@
 
 <script>
 import {login} from "@/api/user";
+import {ElMessage} from "element-plus";
 
 export default {
   name: "LoginForm",
@@ -24,13 +25,13 @@ export default {
   },
   methods: {
     submit() {
-      login()
+      login(this.loginForm.username, this.loginForm.password)
           .then(res => {
             if (res.flag) {
               //跳转到 main.html页面
               location.href = "main";
             } else {
-              alert("登录失败")
+              ElMessage.error('登录失败')
             }
           })
     }
@@ -72,6 +73,7 @@ export default {
 
 .btn {
   text-align: center;
+  cursor: pointer;
   padding: 10px;
   width: 100%;
   margin-top: 40px;
