@@ -66,8 +66,6 @@ export default {
   components: {Right, LeftBubble, RightBubble},
   mounted() {
     this.initUsername();
-    this.initWebSocket();
-    this.scrollToBottom();
   },
   data() {
     return {
@@ -84,6 +82,7 @@ export default {
       getUsername()
           .then(res => {
             this.username = res;
+            this.initWebSocket();
           })
     },
     initWebSocket() {
@@ -123,7 +122,11 @@ export default {
     },
     chatWith(person) {
       // TODO 查询与该用户的聊天记录
-      this.selectedPerson = person
+      this.messages = [];
+
+      // 滚动到最底端
+      this.scrollToBottom();
+      this.selectedPerson = person;
     },
     scrollToBottom() {
       this.$refs.chatWindow.setScrollTop(this.$refs.chatWindow.wrapRef.scrollHeight)
@@ -133,7 +136,6 @@ export default {
         type: 'out',
         content: this.submitText
       })
-      this.submitText = '';
       this.$nextTick(() => {
         this.scrollToBottom()
       })
@@ -141,6 +143,7 @@ export default {
       var message = {toName: this.selectedPerson, message: this.submitText};
       //将输入的数据发送给服务器
       this.ws.send(JSON.stringify(message));
+      this.submitText = '';
     }
   }
 }
