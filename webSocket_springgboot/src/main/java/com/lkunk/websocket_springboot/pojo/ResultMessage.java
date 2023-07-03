@@ -1,35 +1,30 @@
 package com.lkunk.websocket_springboot.pojo;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * @description 服务器发送给浏览器的websocket数据
  */
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ResultMessage {
 
-    private boolean isSystem;
-    private String fromName;
-    private Object message;//如果是系统消息是数组
+    /**
+     * 是否为系统消息
+     */
+    private Boolean isSystem;
 
-    public boolean getIsSystem() {
-        return isSystem;
-    }
+    /**
+     * 发送方id
+     */
+    private Integer from;
 
-    public void setIsSystem(boolean isSystem) {
-        this.isSystem = isSystem;
-    }
+    /**
+     * 如果是系统消息是<K,V>
+     */
+    private Object  message;
 
-    public String getFromName() {
-        return fromName;
-    }
-
-    public void setFromName(String fromName) {
-        this.fromName = fromName;
-    }
-
-    public Object getMessage() {
-        return message;
-    }
-
-    public void setMessage(Object message) {
-        this.message = message;
-    }
 }

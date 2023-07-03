@@ -1,17 +1,20 @@
 package com.lkunk.websocket_springboot.mapper;
 
+import com.lkunk.websocket_springboot.entity.Friend;
 import com.lkunk.websocket_springboot.entity.Record;
+import com.lkunk.websocket_springboot.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
  * @author lkunk
  * @date 2023年07月02日 21:05
- * @description 消息记录mapper
+ * @description 好友mapper
  */
 @Mapper
-public interface RecordMapper {
-    public List<Record> getRecord(Integer username, Integer chatUserId);
+public interface FriendMapper {
+
+    public List<User> getFriends(Integer userId);
+
 }

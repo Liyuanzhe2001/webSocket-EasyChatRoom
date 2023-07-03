@@ -7,4 +7,8 @@ public interface UserMapper {
 
     public String getPassword(String username);
 
+    public Integer getUserId(String username);
+
+    public String getUserName(Integer userId);
+
 }

@@ -18,3 +18,11 @@ export function getUsername() {
         async: false,
     })
 }
+
+export function getUserId() {
+    return axios({
+        url: '/getUserId',
+        method: 'GET',
+        async: false,
+    })
+}

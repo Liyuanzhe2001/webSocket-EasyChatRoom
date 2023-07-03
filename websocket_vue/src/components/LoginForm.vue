@@ -27,7 +27,9 @@ export default {
     submit() {
       login(this.loginForm.username, this.loginForm.password)
           .then(res => {
-            if (res.flag) {
+            if (res.code === 200) {
+              sessionStorage.setItem("username", res.data.username);
+              sessionStorage.setItem("userId", res.data.id);
               //跳转到 main.html页面
               location.href = "main";
             } else {

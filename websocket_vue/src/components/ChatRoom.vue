@@ -3,7 +3,7 @@
     <div class="left_part">
       <el-scrollbar ref="chatWindow" class="chat_window">
         <div v-for="message in messages" :key="message">
-          <div v-if="message.type === 'in'">
+          <div v-if="message.from != this.userId">
             <LeftBubble
                 :content="message.content"
                 max-width="400px"/>
@@ -34,23 +34,18 @@
     </div>
     <div class="right_part">
       <div class="person_list_part">
-        <el-scrollbar height="249px">
-          <p
+        <el-scrollbar height="493px">
+          <div
               v-for="person in personList"
               :key="person"
               class="scrollbar-demo-item"
               @click="chatWith(person)"
           >
-            {{ person }}
-          </p>
+            <div style="float: left">{{ person.username }}</div>
+            <div style="float: right">{{ person.status }}</div>
+          </div>
         </el-scrollbar>
       </div>
-      <el-scrollbar class="system_inform_part">
-        <div v-for="person in personList" :key="person">
-          <p>您的好友&nbsp;{{ person }}&nbsp;已上线</p>
-        </div>
-        <!--        暂无系统消息-->
-      </el-scrollbar>
     </div>
   </div>
 </template>
@@ -59,32 +54,39 @@
 import LeftBubble from "@/components/bubble/LeftBubble";
 import RightBubble from "@/components/bubble/RightBubble";
 import {Right} from "@element-plus/icons-vue";
-import {getUsername} from "@/api/user";
+import {getRecord} from "@/api/record";
+import {getFriends} from "@/api/friend";
+import {ElNotification} from "element-plus";
+import {h} from "vue";
 
 export default {
   name: "ChatRoom",
   components: {Right, LeftBubble, RightBubble},
   mounted() {
-    this.initUsername();
+    getFriends()
+        .then(res => {
+          this.personList = res.data.map(item => {
+            return {
+              ...item,
+              status: '离线'
+            }
+          });
+          this.initWebSocket();
+        })
   },
   data() {
     return {
-      username: '',
+      userId: sessionStorage.getItem("userId"),
+      username: sessionStorage.getItem("username"),
       submitText: '',
       selectedPerson: '',
       personList: [],
+      onlinePeople: [],
       messages: [],
       ws: '',
     }
   },
   methods: {
-    initUsername() {
-      getUsername()
-          .then(res => {
-            this.username = res;
-            this.initWebSocket();
-          })
-    },
     initWebSocket() {
       var vue = this;
       //创建websocket
@@ -100,20 +102,34 @@ export default {
         //判断是系统消息还是推送给个人的消息
         if (res.isSystem) {
           //系统消息
-          vue.personList = [];
-          for (var name of res.message) {
-            if (name !== vue.username) {
-              vue.personList.push(name);
+          vue.personList.forEach((value, index) => {
+            if (res.message.hasOwnProperty(value.id)) {
+              vue.personList[index].status = "在线";
+            } else {
+              vue.personList[index].status = "离线";
             }
-          }
+          })
         } else {
-          if (vue.selectedPerson === res.fromName) {
+          if (vue.selectedPerson.id === res.from) {
             //将数据追加到聊天区
             vue.messages.push({
-              type: "in",
+              id: "",
+              from: vue.selectedPerson.id,
+              to: vue.userId,
               content: res.message,
             })
           }
+          var fromName = ''
+          for (var person of vue.personList) {
+            if (person.id === res.from) {
+              fromName = person.username;
+              break;
+            }
+          }
+          ElNotification({
+            title: '新消息',
+            message: h('i', {style: 'color: teal'}, `${fromName}有新消息`),
+          })
         }
       }
       vue.ws.onclose = function (evt) {
@@ -122,7 +138,11 @@ export default {
     },
     chatWith(person) {
       // TODO 查询与该用户的聊天记录
-      this.messages = [];
+      getRecord(person.id)
+          .then(res => {
+            console.log(res.data)
+            this.messages = res.data;
+          })
 
       // 滚动到最底端
       this.scrollToBottom();
@@ -133,14 +153,16 @@ export default {
     },
     submit() {
       this.messages.push({
-        type: 'out',
+        id: '',
+        from: this.userId,
+        to: this.selectedPerson.id,
         content: this.submitText
       })
       this.$nextTick(() => {
         this.scrollToBottom()
       })
       //定义服务端需要的数据格式
-      var message = {toName: this.selectedPerson, message: this.submitText};
+      var message = {toId: this.selectedPerson.id, message: this.submitText};
       //将输入的数据发送给服务器
       this.ws.send(JSON.stringify(message));
       this.submitText = '';
@@ -162,7 +184,7 @@ export default {
 .left_part {
   float: left;
   display: inline-block;
-  width: 593px;
+  width: 693px;
   height: 498px;
 }
 
@@ -193,7 +215,7 @@ export default {
 .right_part {
   float: right;
   display: inline-block;
-  width: 398px;
+  width: 298px;
   height: 498px;
 }
 
@@ -203,7 +225,6 @@ export default {
 }
 
 .scrollbar-demo-item {
-  display: flex;
   cursor: pointer;
   align-items: center;
   justify-content: center;
@@ -215,13 +236,9 @@ export default {
   color: var(--el-color-primary);
 }
 
-.system_inform_part {
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  margin-top: 3px;
-  height: 237px;
-  padding: 5px;
-  line-height: 30px;
+.scrollbar-demo-item div {
+  line-height: 40px;
+  margin: 0 40px 0 40px;
 }
 
 </style>

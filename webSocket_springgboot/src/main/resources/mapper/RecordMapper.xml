@@ -6,4 +6,11 @@
         from websocket.user
         where username = #{username};
     </select>
+
+    <select id="getRecord" resultType="com.lkunk.websocket_springboot.entity.Record">
+        select *
+        from websocket.record
+        where (`from` = #{param1} and `to` = #{param2})
+           or (`from` = #{param2} and `to` = #{param1});
+    </select>
 </mapper>

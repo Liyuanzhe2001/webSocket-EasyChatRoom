@@ -9,16 +9,11 @@ import com.lkunk.websocket_springboot.pojo.ResultMessage;
  */
 public class MessageUtils {
 
-    public static String getMessage(boolean isSystemMessage, String fromName, Object message) {
+    public static String getMessage(boolean isSystemMessage, Integer to, Object message) {
         try {
-            ResultMessage result = new ResultMessage();
-            result.setIsSystem(isSystemMessage);
-            result.setMessage(message);
-            if (fromName != null) {
-                result.setFromName(fromName);
-            }
-            ObjectMapper mapper = new ObjectMapper();
+            ResultMessage result = new ResultMessage(isSystemMessage, to, message);
 
+            ObjectMapper mapper = new ObjectMapper();
             return mapper.writeValueAsString(result);
         } catch (JsonProcessingException e) {
             e.printStackTrace();

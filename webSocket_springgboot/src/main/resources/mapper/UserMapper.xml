@@ -6,4 +6,16 @@
         from websocket.user
         where username = #{username};
     </select>
+
+    <select id="getUserId" resultType="java.lang.Integer">
+        select id
+        from websocket.user
+        where username = #{username};
+    </select>
+
+    <select id="getUserName" resultType="java.lang.String">
+        select username
+        from websocket.user
+        where id = #{userId};
+    </select>
 </mapper>
