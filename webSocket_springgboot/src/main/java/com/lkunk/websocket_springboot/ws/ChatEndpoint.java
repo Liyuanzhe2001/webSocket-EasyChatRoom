@@ -2,12 +2,15 @@ package com.lkunk.websocket_springboot.ws;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lkunk.websocket_springboot.config.GetHttpSessionConfigurator;
-import com.lkunk.websocket_springboot.mapper.UserMapper;
+import com.lkunk.websocket_springboot.entity.Record;
+import com.lkunk.websocket_springboot.mapper.RecordMapper;
 import com.lkunk.websocket_springboot.pojo.Message;
 import com.lkunk.websocket_springboot.utils.MessageUtils;
+import com.lkunk.websocket_springboot.utils.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -19,8 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class ChatEndpoint {
 
-    @Autowired
-    private UserMapper userMapper;
+    @Resource
+    private RecordMapper recordMapper;
 
     //用来存储每一个客户端对象对应的ChatEndpoint对象
     private static Map<Integer, ChatEndpoint> onlineUsers = new ConcurrentHashMap<>();
@@ -102,8 +105,20 @@ public class ChatEndpoint {
 
             //将数据推送给指定的客户端
             ChatEndpoint chatEndpoint = onlineUsers.get(mess.getToId());
-            chatEndpoint.session.getBasicRemote().sendText(data);
+            // 如果在线,则将消息发送给接收者
+            if (chatEndpoint != null) {
+                chatEndpoint.session.getBasicRemote().sendText(data);
+            }
 
+            // 保存到数据库
+            Record record = new Record(null, userId, mess.getToId(), mess.getMessage());
+            if (recordMapper == null) {
+                this.recordMapper = (RecordMapper) SpringContextUtil.getBean("recordMapper");
+            }
+            int row = recordMapper.addRecord(record);
+            if (row == 0) {
+                // 抛出异常
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

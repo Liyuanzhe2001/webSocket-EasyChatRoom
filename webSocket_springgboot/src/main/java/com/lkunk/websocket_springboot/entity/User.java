@@ -1,6 +1,8 @@
 package com.lkunk.websocket_springboot.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author lkunk
@@ -8,6 +10,8 @@ import lombok.Data;
  * @description User实体类
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     private Integer id;
     private String username;

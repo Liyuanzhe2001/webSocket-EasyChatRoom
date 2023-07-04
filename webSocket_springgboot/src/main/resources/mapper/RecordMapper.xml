@@ -13,4 +13,9 @@
         where (`from` = #{param1} and `to` = #{param2})
            or (`from` = #{param2} and `to` = #{param1});
     </select>
+
+    <insert id="addRecord">
+        insert into websocket.record
+        values (#{id}, #{from}, #{to}, #{content});
+    </insert>
 </mapper>

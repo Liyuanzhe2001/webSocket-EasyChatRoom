@@ -3,7 +3,6 @@ package com.lkunk.websocket_springboot.mapper;
 import com.lkunk.websocket_springboot.entity.Record;
 import org.apache.ibatis.annotations.Mapper;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -13,5 +12,7 @@ import java.util.List;
  */
 @Mapper
 public interface RecordMapper {
-    public List<Record> getRecord(Integer username, Integer chatUserId);
+    public List<Record> getRecord(Integer userId, Integer chatUserId);
+
+    public int addRecord(Record record);
 }
